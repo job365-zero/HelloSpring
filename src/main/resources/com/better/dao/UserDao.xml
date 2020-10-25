@@ -5,6 +5,8 @@
 
 <mapper namespace="com.better.dao.UserDao">
 
-
+    <select id="findAllUser" resultType="user">
+        select * from t_user
+    </select>
 
 </mapper>

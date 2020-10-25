@@ -2,7 +2,6 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <typeAliases>
-         <typeAlias type="com.atguigu.cpes.bean.User" alias="user"/>
-         <typeAlias type="com.atguigu.cpes.bean.Menu" alias="menu"/>
+        <package name="com.better.domain"/>
     </typeAliases>
 </configuration>

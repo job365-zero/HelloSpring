@@ -14,47 +14,53 @@
        http://www.springframework.org/schema/aop
        http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<context:component-scan base-package="com.better.service.impl"></context:component-scan>
-	<context:property-placeholder location="classpath:config/jdbc.properties"/>
-	<!--配置数据源-->
-	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-		<property name="driverClassName" value="${jdbc.driver}"/>
-		<property name="url" value="${jdbc.url}"/>
-		<property name="username" value="${jdbc.user}"/>
+	<context:component-scan base-package="com.better.*">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!-- 加载外部属性配置文件 -->
+	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:config/jdbc.properties" />
+	</bean>
+
+	<!-- 配置C3P0数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
 		<property name="password" value="${jdbc.password}"/>
 	</bean>
-	
+
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-	    <property name="configLocation" value="classpath:mybatis/config.xml"></property>
-	    <property name="dataSource" ref="dataSource"></property>
-		<property name="typeAliasesPackage" value="com.better.domain"/>
+		<property name="configLocation" value="classpath:mybatis/config.xml"></property>
+		<property name="dataSource" ref="dataSource"></property>
+<!--		<property name="mapperLocations">
+			<list>
+				<value>classpath*:mybatis/mapper-*.xml</value>
+			</list>
+		</property>-->
 	</bean>
-	
+
 	<!-- 扫描Mapper映射配置 -->
 	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="com.better.dao"/>
 	</bean>
 
-	<!--1.创建事务管理器对象-->
-	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<!--注入数据源-->
-		<property name="dataSource" ref="dataSource"></property>
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	<!--2.事务增强对象-->
-	<tx:advice id="txAdvice" transaction-manager="txManager">
+
+	<!-- 功能增强器 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="insert*"/>
-			<tx:method name="add*"/>
-			<tx:method name="update*"/>
-			<tx:method name="save*"/>
-			<tx:method name="del*"/>
-			<tx:method name="*" propagation="SUPPORTS" read-only="true"></tx:method>
+			<tx:method name="*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+			<tx:method name="query*" read-only="true"/>
 		</tx:attributes>
 	</tx:advice>
-	<!--3.aop配置切面-->
+
 	<aop:config>
-		<aop:pointcut id="pc" expression="execution(* com.better.service.impl.*.*(..))"></aop:pointcut>
-		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc"></aop:advisor>
+		<aop:advisor advice-ref="transactionAdvice" pointcut="execution(* com.better.service..*Service.*(..))"/>
 	</aop:config>
 
 
