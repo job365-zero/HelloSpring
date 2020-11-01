@@ -1,18 +1,16 @@
 package com.better.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.better.domain.ParamPojo;
+
 import com.better.domain.Result;
 import com.better.domain.User;
 import com.better.service.UserService;
-import org.apache.http.HttpRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
